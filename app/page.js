@@ -14,7 +14,7 @@ function Home() {
     const [nombreTemporal, setNombreTemporal] = useState(''); // Valor temporal del input
     const [tablaDePuntos, setTablaDePuntos] = useState([]);
     const [paisesJugados, setPaisesJugados] = useState(0); // Contador de países jugados
-    const limitePaises = 3; 
+    const limitePaises = 10; 
     const [juegoTerminado, setJuegoTerminado] = useState(false); // Estado para saber si el juego ha terminado
     const [respuestaCorrecta, setRespuestaCorrecta] = useState(false); // Estado para manejar la respuesta correcta
 
@@ -63,50 +63,54 @@ function Home() {
     };
 
  // Función para verificar la respuesta del jugador
-const adivino = () => {
+ const adivino = () => {
     if (respuestaPersona.toLowerCase() === paisElegidoRandom.name.toLowerCase()) {
-        // Actualiza la puntuación
-        setPuntos(prevPuntos => prevPuntos + 10);
+        setPuntos((prevPuntos) => {
+            const nuevosPuntos = prevPuntos + 10;
+            return nuevosPuntos;
+        });
         setRespuestaCorrecta(true); // Marcar como respuesta correcta
 
-        // Solo cambia de país si el juego no ha terminado
         if (!juegoTerminado) {
             elegirPaisRandom(paises); 
         }
-    } else {
-        setRespuestaPersona(''); // Limpiar el input
     }
+    setRespuestaPersona(''); // Limpiar el input
 };
+
 
 
   // Guardar puntuación en la tabla de puntos
-const guardarPuntuacion = () => {
-    // Obtener la puntuación final
-    const puntuacionFinal = puntos;
+  const guardarPuntuacion = () => {
+    setPuntos((prevPuntos) => {
+        const puntuacionFinal = prevPuntos;  // Usamos los puntos más recientes
 
-    // Actualizar la tabla de puntos
-    const nuevaTablaDePuntos = tablaDePuntos.filter(entrada => entrada.nombre !== nombrePersona); // Eliminar puntuaciones antiguas del jugador
-    nuevaTablaDePuntos.push({ nombre: nombrePersona, puntos: puntuacionFinal }); // Agregar la puntuación final
-    setTablaDePuntos(nuevaTablaDePuntos);
-    localStorage.setItem('tablaPuntos', JSON.stringify(nuevaTablaDePuntos));
+        const nuevaTablaDePuntos = tablaDePuntos.filter(entrada => entrada.nombre !== nombrePersona); 
+        nuevaTablaDePuntos.push({ nombre: nombrePersona, puntos: puntuacionFinal }); 
+
+        setTablaDePuntos(nuevaTablaDePuntos);
+        localStorage.setItem('tablaPuntos', JSON.stringify(nuevaTablaDePuntos));
+
+        return puntuacionFinal; // Aseguramos que el valor de puntos no cambie después de guardar
+    });
 };
+
 
 
     // Terminar el juego manualmente
 // Terminar el juego manualmente
 const terminarJuego = () => {
-    // Asegúrate de que la puntuación final se guarda
-    // Solo llama a adivino si el juego no ha terminado
     if (!juegoTerminado) {
         adivino();
     }
 
     // Guarda la puntuación automáticamente al terminar
-    guardarPuntuacion(); 
+    guardarPuntuacion();
 
     // Marcar el juego como terminado
     setJuegoTerminado(true);
 };
+    
 
 
 
